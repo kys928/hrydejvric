@@ -1,0 +1,72 @@
+# import gravity as gravity
+import pygame
+
+pygame.init()
+
+width = 1000
+height = 600
+
+display = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Street fighter")
+
+bg_image = pygame.image.load('C:/Users/adm/PycharmProjects/pythonProject/venv/imaze.gif').convert_alpha()
+
+x1 = 200
+y1 = 310
+x2 = 700
+y2 = 310
+
+fps = 60
+f = 120
+clock = pygame.time.Clock()
+gravity = 300
+
+
+def bg():
+    scaled_bg = pygame.transform.scale(bg_image, (width, height))
+    display.blit(scaled_bg, (0, 0))
+
+
+def fighter1():
+    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x1, y1, 60, 150))
+
+
+def fighter2():
+    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x2, y2, 60, 150))
+
+
+run = True
+
+while run:
+
+    clock.tick(f)
+
+    bg()
+
+    fighter1()
+    fighter2()
+
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_a and x1 > fps:
+                x1 -= fps
+            if event.key == pygame.K_d and x1 < width - fps:
+                x1 += fps
+            if event.key == pygame.K_w:
+                y1 -= fps * 2
+                pygame.display.update()
+                if y1 > 310:
+                    y1 += 150
+            if event.key == pygame.K_LEFT and x2 > fps:
+                x2 -= fps
+            if event.key == pygame.K_RIGHT and x2 < width - fps:
+                x2 += fps
+            if event.key == pygame.K_UP:
+                y2 -= fps * 2
+            if event.key == pygame.K_SPACE or event.key == pygame.K_KP_ENTER:
+                pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1, y1, 60, 310)))
+
+    pygame.display.update()
