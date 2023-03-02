@@ -11,14 +11,27 @@ pygame.display.set_caption("Street fighter")
 bg_image = pygame.image.load('C:/Users/adm/PycharmProjects/pythonProject/venv/imaze.gif').convert_alpha()
 
 x1 = 200
-y1 = 310
+y1 = display.get_height() - 200
 x2 = 700
-y2 = 310
+y2 = display.get_height() - 200
 
-fps = 60
+fps = 5
 f = 120
+gravity = 5
+attack = True
 clock = pygame.time.Clock()
-gravity = 10
+
+move_left = False
+move_right = False
+move_up = False
+jump = False
+jumpCount = 10
+health1 = 200
+health2 = 200
+x = 0
+
+z1 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1 + 70, y1, 70, 150)))
+z2 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x2 - 70, y1, 70, 150)))
 
 
 def bg():
@@ -27,12 +40,21 @@ def bg():
 
 
 def fighter1():
-    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x1, y1, 60, 150))
+    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x1, y1, 70, 150))
 
 
 def fighter2():
-    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x2, y2, 60, 150))
+    pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x2, y2, 70, 150))
 
+def health_bar1():
+    health_bar1 = pygame.draw.rect(display, (0, 0, 0), pygame.Rect(450 - x, 20))
+    display.blit(health_bar1, (0, 0))
+    pygame.draw.rect(display, (0, 0, 255), pygame.Rect(0, 0, 450, 20))
+
+def health_bar2():
+    health_bar2 = pygame.draw.rect(display, (0, 0, 0), pygame.Rect(600, 0, 450, 20))
+    display.blit(health_bar2, (600, 0))
+    pygame.draw.rect(display, (0, 0, 255), pygame.Rect(600, 0, 450, 20))
 
 
 run = True
@@ -46,23 +68,66 @@ while run:
     fighter1()
     fighter2()
 
+    health_bar1()
+    health_bar2()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a and x1 > fps:
-                x1 -= fps
-            if event.key == pygame.K_d and x1 < width - fps:
-                x1 += fps
+            if event.key == pygame.K_a:
+                move_right = True
+            if event.key == pygame.K_d:
+                move_left = True
             if event.key == pygame.K_w:
-                y1 -= fps * 2
-            if event.key == pygame.K_LEFT and x2 > fps:
-                x2 -= fps
-            if event.key == pygame.K_RIGHT and x2 < width - fps:
-                x2 += fps
-            if event.key == pygame.K_UP:
-                y2 -= fps * 2
-            if event.key == pygame.K_SPACE or event.key == pygame.K_KP_ENTER:
-                pygame.draw.rect(display, (0, 255, 0), pygame.Rect(x2, y2, 60, 150))
+                move_up = True
+            if event.key == pygame.K_SPACE and x1 < x2:
+                z1 = pygame.draw.rect(display, (0, 255, 0),
+                                      pygame.Rect((x1 + 70, y1, 70, 150)))  # otocit postavicku do druheho smeru
+            elif event.key == pygame.K_SPACE and x1 > x2:
+                z1 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1 - 70, y1, 70, 150)))
+            if event.key == pygame.K_p and x2 > x1:
+                z2 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x2 - 70, y1, 70, 150)))
+            elif event.key == pygame.K_p and x2 < x1:
+                z2 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x2 + 70, y1, 70, 150)))
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_a:
+                move_right = False
+            if event.key == pygame.K_d:
+                move_left = False
+            if event.key == pygame.K_w:
+                move_up = False
+    if move_right and x1 > fps:
+        x1 -= fps
+    if move_left and x1 < width - fps:
+        x1 += fps
+    if not jump:
+        if move_up and y1 > fps:
+            y1 -= 50
+            jump = True
+    else:
+        if jumpCount >= -10:
+            neg = 1
+            if jumpCount < 0:
+                neg = -1
+            y1 -= (jumpCount ** 2) * 0.5 * neg
+            jumpCount -= 1
+        else:
+            y1 = display.get_height() - 200
+            jump = False
+            jumpCount = 10
+
+    if (pygame.Rect(x1, y1, 70, 150)).colliderect(pygame.Rect(x2, y2, 70, 150)):
+        move_left = False
+
+    if (pygame.Rect(x2, y2, 70, 150)).colliderect(pygame.Rect(x1, y1, 70, 150)):
+        move_right = False
+
+    if z1.colliderect(z2) or z2.colliderect(z1):
+        health1_change = health1 -  10
+        if health1_change < health1:
+           health_bar1 =pygame.draw.rect(display, (0, 0, 255), pygame.Rect(0, 0, 440, 20))
+
+
+
     pygame.display.update()
