@@ -18,7 +18,7 @@ y2 = display.get_height() - 200
 fps = 5
 f = 120
 gravity = 5
-attack = True
+attack = False
 clock = pygame.time.Clock()
 
 move_left = False
@@ -26,9 +26,13 @@ move_right = False
 move_up = False
 jump = False
 jumpCount = 10
-health1 = 200
-health2 = 200
-x = 0
+h1 = 0
+h2 = 0
+health1 = 200 - h1
+health2 = 200 - h2
+
+health_bar_width = 200
+health_bar_height = 20
 
 z1 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1 + 70, y1, 70, 150)))
 z2 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x2 - 70, y1, 70, 150)))
@@ -46,15 +50,17 @@ def fighter1():
 def fighter2():
     pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x2, y2, 70, 150))
 
-def health_bar1():
-    health_bar1 = pygame.draw.rect(display, (0, 0, 0), pygame.Rect(450 - x, 20))
-    display.blit(health_bar1, (0, 0))
-    pygame.draw.rect(display, (0, 0, 255), pygame.Rect(0, 0, 450, 20))
 
-def health_bar2():
-    health_bar2 = pygame.draw.rect(display, (0, 0, 0), pygame.Rect(600, 0, 450, 20))
-    display.blit(health_bar2, (600, 0))
-    pygame.draw.rect(display, (0, 0, 255), pygame.Rect(600, 0, 450, 20))
+def draw_health_bar1(display, x, y, health):
+    health_bar_width = int(health - h1)
+    pygame.draw.rect(display, (0, 0, 0), [x, y, 200, health_bar_height])
+    pygame.draw.rect(display, (0, 0, 255), [x, y, health_bar_width, health_bar_height])
+
+
+def draw_health_bar2(display, x, y, health):
+    health_bar_width = int(health - h2)
+    pygame.draw.rect(display, (0, 0, 0), [x, y, 200, health_bar_height])
+    pygame.draw.rect(display, (0, 0, 255), [x, y, health_bar_width, health_bar_height])
 
 
 run = True
@@ -68,8 +74,8 @@ while run:
     fighter1()
     fighter2()
 
-    health_bar1()
-    health_bar2()
+    draw_health_bar1(display, 0, 0, health1)
+    draw_health_bar2(display, 800, 0, health2)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -123,11 +129,13 @@ while run:
     if (pygame.Rect(x2, y2, 70, 150)).colliderect(pygame.Rect(x1, y1, 70, 150)):
         move_right = False
 
-    if z1.colliderect(z2) or z2.colliderect(z1):
-        health1_change = health1 -  10
-        if health1_change < health1:
-           health_bar1 =pygame.draw.rect(display, (0, 0, 255), pygame.Rect(0, 0, 440, 20))
+    if z1.colliderect(z2):
+        attack = True
+        i = 0
+        while i < 1:
+            h2 += 10
+            break
 
-
+        pygame.display.update()
 
     pygame.display.update()
