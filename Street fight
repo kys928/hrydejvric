@@ -15,10 +15,8 @@ y1 = display.get_height() - 200
 x2 = 700
 y2 = display.get_height() - 200
 
-fps = 5
-f = 120
-gravity = 5
-attack = False
+fps = 30
+f = 30
 clock = pygame.time.Clock()
 
 move_left = False
@@ -26,12 +24,13 @@ move_right = False
 move_up = False
 jump = False
 jumpCount = 10
-h1 = 0
-h2 = 0
-health1 = 200 - h1
-health2 = 200 - h2
+damage1 = 0
+damage2 = 0
+health1 = 200 - damage1
+health2 = 200 - damage2
+collide = False
 
-health_bar_width = 200
+#health_bar_width = 200
 health_bar_height = 20
 
 z1 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1 + 70, y1, 70, 150)))
@@ -51,14 +50,16 @@ def fighter2():
     pygame.draw.rect(display, (255, 0, 0), pygame.Rect(x2, y2, 70, 150))
 
 
+
 def draw_health_bar1(display, x, y, health):
-    health_bar_width = int(health - h1)
+    #health_bar_width = 200
+    health_bar_width = int(health - damage1)
     pygame.draw.rect(display, (0, 0, 0), [x, y, 200, health_bar_height])
     pygame.draw.rect(display, (0, 0, 255), [x, y, health_bar_width, health_bar_height])
 
 
 def draw_health_bar2(display, x, y, health):
-    health_bar_width = int(health - h2)
+    health_bar_width = int(health - damage2)
     pygame.draw.rect(display, (0, 0, 0), [x, y, 200, health_bar_height])
     pygame.draw.rect(display, (0, 0, 255), [x, y, health_bar_width, health_bar_height])
 
@@ -90,6 +91,7 @@ while run:
             if event.key == pygame.K_SPACE and x1 < x2:
                 z1 = pygame.draw.rect(display, (0, 255, 0),
                                       pygame.Rect((x1 + 70, y1, 70, 150)))  # otocit postavicku do druheho smeru
+                # skusit iny sposob na blitovanie rectov
             elif event.key == pygame.K_SPACE and x1 > x2:
                 z1 = pygame.draw.rect(display, (0, 255, 0), pygame.Rect((x1 - 70, y1, 70, 150)))
             if event.key == pygame.K_p and x2 > x1:
@@ -129,13 +131,20 @@ while run:
     if (pygame.Rect(x2, y2, 70, 150)).colliderect(pygame.Rect(x1, y1, 70, 150)):
         move_right = False
 
-    if z1.colliderect(z2):
-        attack = True
-        i = 0
-        while i < 1:
-            h2 += 10
-            break
+    number_of_hits = 0
 
-        pygame.display.update()
+    for number_of_hits in range(20):
+        if number_of_hits <= 20:
+            if collide != True:
+                if z1.colliderect(z2):
+                    collide = True
+                    damage2 += 10
+                    number_of_hits += 1
+                else:
+                    collide = False
+            else:
+                pass
+        elif number_of_hits == 200 / 10:
+            print("You win")
 
     pygame.display.update()
